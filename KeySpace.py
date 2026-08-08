@@ -88,7 +88,7 @@ def About():
 
  title = ck.CTkLabel(window_about, text='KeySpace', font=('Roboto', 24, 'bold'), text_color='lightblue')
  title.pack(pady=(20, 5))
- version = ck.CTkLabel(window_about, text='Version V2.0', font=('Roboto', 16))
+ version = ck.CTkLabel(window_about, text='Version V3.0', font=('Roboto', 16))
  version.pack()
  author = ck.CTkLabel(window_about, text='Github - Velocity-7', font=('Roboto', 14))
  author.pack(pady=(0, 15))
