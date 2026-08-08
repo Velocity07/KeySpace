@@ -12,7 +12,7 @@ def run_command(command, shell=False):
 
 def install_requirements():
     print('[*] Installing required build dependencies...')
-    run_command([sys.executable, '-m', 'pip', 'install', '--upgrade', 'pip', 'pyinstaller', 'customtkinter'])
+    run_command([sys.executable, '-m', 'pip', 'install', '--upgrade', 'pip', 'pyinstaller', 'customtkinter', 'pillow'])
 
 def clean_build_dirs():
     print('[*] Cleaning old build files...')
