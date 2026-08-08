@@ -16,7 +16,7 @@ You can use the provided build script to compile KeySpace into a standalone appl
    ```bash
    python build.py
    ```
-4. The script will automatically install the necessary build dependencies (`pyinstaller`, `customtkinter`), clean up old builds, and compile the app for your operating system.
+4. The script will automatically install the necessary build dependencies (`pyinstaller`, `customtkinter`, `pillow`), clean up old builds, and compile the app for your operating system.
 
 **Build Outputs (found in the `dist` folder):**
 - **Windows:** `KeySpace.exe`
