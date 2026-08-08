@@ -1,13 +1,33 @@
+import sys, os
 import customtkinter as ck
 import sqlite3, shutil
 from tkinter import filedialog, messagebox
+
+def get_vault_path(filename):
+    if getattr(sys, 'frozen', False):
+        if sys.platform == 'darwin':
+            base_dir = os.path.expanduser('~/Library/Application Support/KeySpace')
+        elif sys.platform == 'win32':
+            base_dir = os.path.join(os.environ.get('APPDATA', os.path.expanduser('~')), 'KeySpace')
+        else:
+            base_dir = os.path.expanduser('~/.keyspace')
+        os.makedirs(base_dir, exist_ok=True)
+        if filename.endswith('.ico') or filename.endswith('.icns') or filename.endswith('.png'):
+            return os.path.join(sys._MEIPASS, 'Vault', filename)
+        db_path = os.path.join(base_dir, filename)
+        if not os.path.exists(db_path) and filename == 'Passwords.db':
+            bundled_db = os.path.join(sys._MEIPASS, 'Vault', filename)
+            if os.path.exists(bundled_db):
+                shutil.copy2(bundled_db, db_path)
+        return db_path
+    return os.path.join('Vault', filename)
 
 ck.set_appearance_mode('System')
 ck.set_default_color_theme('blue')
 
 window = ck.CTk()
 window.geometry('870x550')
-window.iconbitmap('Vault/Logo.ico')
+window.iconbitmap(get_vault_path('Logo.ico'))
 window.title('KeySpace')
 
 title_label = ck.CTkLabel(window, text='Welcome to KeySpace', text_color='lightblue', font=('Roboto', 24, 'bold'))
@@ -62,7 +82,7 @@ footer_frame.pack(fill='x', side='bottom', padx=20, pady=(0, 20))
 def About():
  window_about = ck.CTkToplevel(window)
  window_about.geometry('350x180')
- window_about.iconbitmap('Vault/Logo.ico')
+ window_about.iconbitmap(get_vault_path('Logo.ico'))
  window_about.title('About KeySpace')
  window_about.grab_set()
 
@@ -85,7 +105,7 @@ def Clear():
  Line_2.configure(text='')    
 
 def Delete():
- database_connector = sqlite3.connect('Vault/Passwords.db')
+ database_connector = sqlite3.connect(get_vault_path('Passwords.db'))
  database_cursor = database_connector.cursor()
 
  database_cursor.execute('DELETE from passwords WHERE oid= ' + Delete_Entry.get())
@@ -99,7 +119,7 @@ def Export():
  file_path = filedialog.asksaveasfilename(defaultextension='.db', initialfile='Passwords.db', filetypes=[('Database files', '*.db'), ('All files', '*.*')], title='Export Database')
  if file_path:
   try:
-   shutil.copy2('Vault/Passwords.db', file_path)
+   shutil.copy2(get_vault_path('Passwords.db'), file_path)
    messagebox.showinfo('Export Successful', 'Database exported successfully!')
   except Exception as e:
    messagebox.showerror('Export Failed', f'An error occurred: {e}')
@@ -108,14 +128,14 @@ def Import():
  file_path = filedialog.askopenfilename(filetypes=[('Database files', '*.db'), ('All files', '*.*')], title='Import Database')
  if file_path:
   try:
-   shutil.copy2(file_path, 'Vault/Passwords.db')
+   shutil.copy2(file_path, get_vault_path('Passwords.db'))
    messagebox.showinfo('Import Successful', 'Database imported successfully!')
    Show()
   except Exception as e:
    messagebox.showerror('Import Failed', f'An error occurred: {e}')
 
 def Save():
- database_connector = sqlite3.connect('Vault/Passwords.db')
+ database_connector = sqlite3.connect(get_vault_path('Passwords.db'))
  database_cursor = database_connector.cursor()
  database_cursor.execute('INSERT INTO passwords VALUES (:App_Entry, :Pass_Entry)',
  {
@@ -130,7 +150,7 @@ def Save():
  Show()
 
 def Show():
- database_connector = sqlite3.connect('Vault/Passwords.db')
+ database_connector = sqlite3.connect(get_vault_path('Passwords.db'))
  database_cursor = database_connector.cursor()
  database_cursor.execute('SELECT *, oid FROM passwords')
  records = database_cursor.fetchall()
@@ -161,7 +181,7 @@ Button_Quit.pack(side='right', padx=5)
 Button_About = ck.CTkButton(footer_frame, text='About', hover_color='grey', command=About)
 Button_About.pack(side='left', padx=5)
 
-database_connector = sqlite3.connect('Vault/Passwords.db')
+database_connector = sqlite3.connect(get_vault_path('Passwords.db'))
 database_cursor = database_connector.cursor()
 
 database_connector.commit()
